@@ -5,7 +5,7 @@ public with sharing class TestGitHubClass {
     }
     public void addedNewMethod(){
         for(integer i =0;i<5; i++){
-            system.debug('looping variable '+i);
+            system.debug('created a feature branch'+i);
         }
     }
 }
