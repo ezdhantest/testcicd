@@ -8,7 +8,7 @@ public with sharing class TestGitHubClass {
             system.debug('changed apex class'+i);
             system.debug('featured branch'+i);
             //verify if PR is getting validated or not
-            //pushed with latest change
+            //check if PR is getting validated or not
         }
     }
 }
