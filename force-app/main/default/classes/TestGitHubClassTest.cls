@@ -1,5 +1,6 @@
 @istest
 private with sharing class TestGitHubClassTest {
+    @istest
    static void main(){
         test.startTest();
             TestGitHubClass controller = new TestGitHubClass();
