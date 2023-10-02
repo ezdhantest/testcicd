@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Validate PR on master branch
+name: Validate PR on development branch
 
 # Definition when the workflow should run
 on:
