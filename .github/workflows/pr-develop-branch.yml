@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Validate PR on master branch
+name: Validate PR on development branch
 
 # Definition when the workflow should run
 on:
@@ -162,7 +162,7 @@ jobs:
 
             # Now we upload the .sarif file as explained in the previous step
             - name: Upload SARIF file
-              uses: github/codeql-action/upload-sarif@v1
+              uses: github/codeql-action/upload-sarif@v2
               with:
                 sarif_file: changed-sources/apexScanResults.sarif
 
