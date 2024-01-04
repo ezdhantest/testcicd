@@ -1,4 +1,7 @@
 public with sharing class TestGitHubClass {
+/**
+    Adding comments to test
+**/
     public TestGitHubClass() {
         //adding changes via first branch
         string variable = '';
