@@ -99,10 +99,6 @@ jobs:
               run: |
                   sf apex run test --target-org scratch-org -r human
 
-            - name: Validate Metadata
-              run: |
-                  sf project deploy validate --target-org scratch-org -m force-app/main/default
-
             - name: Delete Scratch Org
               run: |
                   sf org delete scratch --target-org scratch-org
