@@ -93,7 +93,7 @@ jobs:
                   sfdx plugins 
             - name: Create Scratch Org
               run: |
-                  sfdx auth:jwt:grant --clientid ${secrets.SFDX_HUB_CLIENT_ID} --username ${secrets.SFDX_HUB_USERNAME} --jwtkeyfile assets/devhub.key
+                  sfdx auth:jwt:grant --clientid ${{secrets.SFDX_HUB_CLIENT_ID}} --username ${{secrets.SFDX_HUB_USERNAME}} --jwtkeyfile assets/devhub.key
                   sfdx force:org:create -f config/project-scratch-def.json -a scratch-org -v
 
             - name: Push Source to Scratch Org
