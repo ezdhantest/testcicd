@@ -97,11 +97,11 @@ jobs:
 
             - name: Run Apex Tests
               run: |
-                  sf apex run test -u scratch-org -r human
+                  sf apex run test --target-org scratch-org -r human
 
             - name: Validate Metadata
               run: |
-                  sf project deploy validate -u scratch-org -m force-app/main/default
+                  sf project deploy validate ---target-org scratch-org -m force-app/main/default
 
             - name: Delete Scratch Org
               run: |
