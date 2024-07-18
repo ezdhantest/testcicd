@@ -84,14 +84,16 @@ jobs:
             # This is an awesome plugin that allows us to extract a package.xml with the metadata
             # that has changed between commits. I highly recommend going over the github readme 
             # for more information on how this works.
-
+            - name: Decrypt the server.key.enc file & store inside assets folder
+              run: |
+                    openssl enc -nosalt -aes-256-cbc -d -in devhub.key.enc -out devhub.key -base64 -K DE3B4F6346E0CFA95CA695168A0FD8DA4D06AE808A0AFA9A4DBD2502D5DD6FE7 -iv AC767FEDCF2105140E84B62495C3F43A     
             - name: 'Installing sfdx git delta'
               run: | 
                   echo y | sfdx plugins:install sfdx-git-delta
                   sfdx plugins 
             - name: Create Scratch Org
               run: |
-                  sfdx auth:jwt:grant --clientid ${SFDX_HUB_CLIENT_ID} --username ${SFDX_HUB_USERNAME} --jwtkeyfile ${SFDX_HUB_JWT_KEY_FILE}
+                  sfdx auth:jwt:grant --clientid ${SFDX_HUB_CLIENT_ID} --username ${SFDX_HUB_USERNAME} --jwtkeyfile assets/devhub.key
                   sfdx force:org:create -f config/project-scratch-def.json -a scratch-org -v
 
             - name: Push Source to Scratch Org
