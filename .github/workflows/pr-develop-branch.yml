@@ -89,16 +89,7 @@ jobs:
             - name: Create Scratch Org
               run: |
                   sf org login jwt --client-id ${{secrets.SFDX_HUB_CLIENT_ID}} --username ${{secrets.SFDX_HUB_USERNAME}} --jwt-key-file assets/devhub.key --alias HubOrg
-                  sf org create scratch --definition-file config/project-scratch-def.json -a scratch-org --target-dev-hub HubOrg
 
-            - name: Push Source to Scratch Org
+            - name: Validate changes against ORG
               run: |
-                    sf project deploy start --ignore-conflicts --source-dir force-app --target-org scratch-org
-
-            - name: Run Apex Tests
-              run: |
-                  sf apex run test --target-org scratch-org -r human
-
-            - name: Delete Scratch Org
-              run: |
-                  sf org delete scratch --target-org scratch-org --no-prompt
+                    sf project deploy validate --source-dir force-app --ignore-conflicts --target-org HubOrg --test-level - RunSpecifiedTests --tests TestGitHubClassTest

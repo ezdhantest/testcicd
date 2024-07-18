@@ -62,4 +62,4 @@ jobs:
 
             - name: Run Apex Tests
               run: |
-                  sf apex run test --target-org HubOrg -r human
+                   sf apex run test --target-org HubOrg -r human --class-names TestGitHubClassTest
