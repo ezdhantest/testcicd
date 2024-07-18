@@ -89,7 +89,7 @@ jobs:
             - name: Create Scratch Org
               run: |
                   sf org login jwt --client-id ${{secrets.SFDX_HUB_CLIENT_ID}} --username ${{secrets.SFDX_HUB_USERNAME}} --jwt-key-file assets/devhub.key --alias HubOrg
-                  sf force:org:create scratch -f config/project-scratch-def.json -a scratch-org --target-dev-hub HubOrg
+                  sf org create scratch --definition-file config/project-scratch-def.json -a scratch-org --target-dev-hub HubOrg
 
             - name: Push Source to Scratch Org
               run: |
