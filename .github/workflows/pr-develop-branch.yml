@@ -86,7 +86,7 @@ jobs:
             # for more information on how this works.
             - name: Decrypt the server.key.enc file & store inside assets folder
               run: |
-                    openssl enc -nosalt -aes-256-cbc -d -in devhub.key.enc -out devhub.key -base64 -K DE3B4F6346E0CFA95CA695168A0FD8DA4D06AE808A0AFA9A4DBD2502D5DD6FE7 -iv AC767FEDCF2105140E84B62495C3F43A     
+                    openssl enc -nosalt -aes-256-cbc -d -in assets/devhub.key.enc -out assets/devhub.key -base64 -K DE3B4F6346E0CFA95CA695168A0FD8DA4D06AE808A0AFA9A4DBD2502D5DD6FE7 -iv AC767FEDCF2105140E84B62495C3F43A     
             - name: 'Installing sfdx git delta'
               run: | 
                   echo y | sfdx plugins:install sfdx-git-delta
