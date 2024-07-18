@@ -4,6 +4,7 @@ private with sharing class TestGitHubClassTest {
    static void main(){
         test.startTest();
             TestGitHubClass controller = new TestGitHubClass();
+system.debug('added debug statement');
             controller.addedNewMethod();
         test.stopTest();
    }

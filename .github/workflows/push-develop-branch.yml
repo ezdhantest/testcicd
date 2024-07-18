@@ -15,55 +15,51 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
         steps:
-            # Install Salesforce CLI
-            - name: 'Install Salesforce CLI'
-              run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
-                  mkdir ~/sfdx
-                  tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-                  echo "$HOME/sfdx/bin" >> $GITHUB_PATH
-                  ~/sfdx/bin/sfdx version
+            # Now we install nodejs in the VM, and specify version 14
+            - uses: actions/setup-node@v4
+              with:
+                node-version: '18.6.0'
 
-            # install SFDX-Git-Delta plugin - https://github.com/scolladon/sfdx-git-delta
-            - name: 'Installing sfdx git delta'
-              run: | 
-                  echo y | sfdx plugins:install sfdx-git-delta
-                  sfdx plugins 
+            # The idea is that the VM can access your remote repository
+            # because your repository is an sfdx project.
+            # This is a default action that allows us to enter the root 
+            # directory of the repository
 
-            # Checkout the source code
+            # Make sure to specify fetch-depth:0. This allows us to
+            # access previous commits that have been pushed to the repository.
+
+            # We'll need this later when we try to figure out which metadata has 
+            # changed between commits, so that we can only deploy that metadata
+            # to the destination org
+
             - name: 'Checkout source code'
               uses: actions/checkout@v3
               with:
                 fetch-depth: 0
-
-            # Store secret for both otgs
-            - name: 'Populate auth file with SFDX_URL secret of the integration and staging orgs'
-              shell: bash
+            - name: Install NPM
               run: |
-                  echo ${{ secrets.SFDX_INTEGRATION_URL}} > ./SFDX_INTEGRATION_URL.txt
-                  echo ${{ secrets.SFDX_STAGING_URL}} > ./SFDX_STAGING_URL.txt
+                  npm install
+            # Now Install Salesforce CLI
+            - name: Install the SFDX CLI
+              run: |
+                npm install @salesforce/cli --global
+                sf --help
 
-            - name: 'Create delta packages for new, modified or deleted metadata'
-              run: | 
-                  mkdir changed-sources
-                  sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+            # Then we install the SFDX-Git-Delta plugin - https://github.com/scolladon/sfdx-git-delta
+            # This is an awesome plugin that allows us to extract a package.xml with the metadata
+            # that has changed between commits. I highly recommend going over the github readme 
+            # for more information on how this works.
+            - name: Decrypt the server.key.enc file & store inside assets folder
+              run: |
+                    openssl enc -nosalt -aes-256-cbc -d -in assets/devhub.key.enc -out assets/devhub.key -base64 -K DE3B4F6346E0CFA95CA695168A0FD8DA4D06AE808A0AFA9A4DBD2502D5DD6FE7 -iv AC767FEDCF2105140E84B62495C3F43A     
+            - name: Authrorize Staging Org
+              run: |
+                  sf org login jwt --client-id ${{secrets.SFDX_HUB_CLIENT_ID}} --username ${{secrets.SFDX_HUB_USERNAME}} --jwt-key-file assets/devhub.key --alias HubOrg
 
-            # Authenticate to org
-            #- name: 'Authenticate to Integration Org'
-            #  run: sfdx auth:sfdxurl:store -f ./SFDX_INTEGRATION_URL.txt -s -a integration
+            - name: Push Source to Staging Org
+              run: |
+                    sf project deploy start --ignore-conflicts --source-dir force-app --target-org HubOrg
 
-            #- name: 'Deploy the entire branch to Integration org'
-             # run: sfdx force:source:deploy -p force-app --testlevel RunLocalTests --json
-
-           # - name: 'Deploy destructive changes (if any) to Integration org'
-           #   run: sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings 
-
-            # Authenticate to Staging org
-            - name: 'Authenticate and deploy Staging org'
-              run: sfdx auth:sfdxurl:store -f ./SFDX_STAGING_URL.txt -s -a staging
-
-            - name: 'Deploy the entire branch'
-              run: sfdx force:source:deploy -p force-app --testlevel RunLocalTests --json
-
-            - name: 'Deploy destructive changes (if any) to Staging org'
-              run: sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings
+            - name: Run Apex Tests
+              run: |
+                   sf apex run test --target-org HubOrg -r human --class-names TestGitHubClassTest
