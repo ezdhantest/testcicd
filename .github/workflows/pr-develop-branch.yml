@@ -101,4 +101,4 @@ jobs:
 
             - name: Delete Scratch Org
               run: |
-                  sf org delete scratch --target-org scratch-org
+                  sf org delete scratch --target-org scratch-org --no-prompt
